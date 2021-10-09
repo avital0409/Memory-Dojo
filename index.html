@@ -1,0 +1,41 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>The Memory Dojo</title>
+    <link rel="stylesheet" href="css/navtop-style.css" />
+    <link rel="stylesheet" href="css/main-content.css" />
+    <link rel="stylesheet" href="css/card-animation.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@700&display=swap" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.1.1.js"></script>
+    <script src="scripts/main.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
+</head>
+<body>
+    <div class="topnav">
+        <div id="menu">
+            <img src="images/menu.png" id="hamburger" />
+        </div>
+        <div id="title">the memory dojo</div>
+        <div id="level" hidden>Level: 1</div>
+    </div>
+    <div class="pageContent">
+        <div id="page-title">
+            <img src="images/logo.png" id="logo"/>
+            <h1>The Memory Dojo</h1>
+        </div>
+        <div id="board">
+        </div>
+    </div>
+    <div id="winDialog" class="modal">
+        <div class="modalContent">
+            <h1>You did it!</h1>
+            <h2>Start a new game?</h2>
+            <div class="closeDialog" onclick="startGame(1)">Sure!</div>
+        </div>
+    </div>
+</body>
+</html>

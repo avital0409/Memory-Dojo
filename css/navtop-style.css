@@ -1,0 +1,53 @@
+﻿
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap');
+
+body{
+    margin: 0;
+}
+
+.topnav {
+    background-color: #5CE1E6;
+    height: 50px;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    top: 0;
+    border-bottom: 1px solid black;
+    color: white;
+    display: grid;
+    grid-template-columns: 100px auto 250px;
+    position: fixed;
+}
+
+#menu {
+    display: flex;
+    justify-content: center;
+}
+
+#hamburger {
+    margin: auto;
+    width: 30px;
+    height: 30px;
+}
+
+.topnav *{
+    line-height: 50px;
+}
+
+    .topnav #title {
+        padding-left: 30px;
+        font-family: 'DM Sans', sans-serif;
+        text-transform: uppercase;
+    }
+
+    .topnav #level {
+        font-family: 'Roboto Mono', monospace;
+        font-size: x-large;
+    }
+
+    .topnav #menu {
+        border-right: 1px solid black;
+        background-color: #9CFBFF;
+        height: 50px;
+    }
