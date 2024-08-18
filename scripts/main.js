@@ -1,28 +1,16 @@
-﻿
-var images = [
-	"images/cards/Watermelon.png",
-	"images/cards/Starfish.png",
-	"images/cards/Galgal.png",
-	"images/cards/Tree.png",
-	"images/cards/Flamingo.png",
-	"images/cards/Map.png",
-	"images/cards/Leaf.png",
-	"images/cards/Snapirim.png",
-	"images/cards/Flower.png",
-	"images/cards/FlipFlops.png",
-	"images/cards/Sunglasses.png",
-];
+﻿import { images } from './assets.js';
 
-let cards = 4 * 2;
+const DEFAULT_CARD_SIZE = 150;
+
+let playerName;
+let cards;
 let revealedCards = 0;
 let pairsFound = 0;
 let intervalHandler;
+let intervalId;
+let cardSize;
 
-$(function () {
-	startGame();
-});
-
-function startGame(e) {
+const startGame = (e) => {
 	if (e != null) {
 		$(".cards").remove();
 		$(".modal").hide();
@@ -31,41 +19,49 @@ function startGame(e) {
 	pairsFound = 0;
 	initializeBoard();
 	intervalHandler = setInterval(intervalsHandler, 2000);
+	startTimer();
 }
 
-function initializeBoard() {
-	let board = $("#board");
+const initializeBoard = () => {
 	let imagesArr = chooseImages();
 	shuffle(imagesArr);
+	createCards(imagesArr);
+	calculateOptimalCardSize();
+	adjustCardSize();
+}
 
-	for (cardId = 1; cardId <= cards; cardId++) {
+const createCards = (chosenImages) => {
+	const board = $("#board");
+
+	for (let cardId = 1; cardId <= cards; cardId++) {
 		let cardScene = $("<div></div>").attr({
-			"class": "cards",
+			"class": "cards m-0",
 			"id": "cardScene" + cardId
 		});
 
 		let card = $("<div></div>").attr({
-			"class": "card",
+			"class": "card w-100 h-100",
 			"id": "card" + cardId
 		});
 
 		let cardFront = $("<div></div>").attr({
 			"class": "card-front",
 			"id": "card" + cardId + "Front"
-		}).css("background-image", "url(" + imagesArr[cardId-1] + ")");
+		}).css("background-image", "url(" + chosenImages[cardId-1] + ")")
+		.css("background-size", "contain");
 
 		let cardBack = $("<div></div>").attr({
-			"class": "card-back",
+			"class": "card-back position-relative",
 			"id": "card" + cardId + "Back"
 		});
 
 		let cardBackDrawing = $("<div></div>").attr({
-			"class": "card-back-drawing",
+			"class": "card-back-drawing position-absolute top-50 start-50 translate-middle",
 			"id": "card-back-drawing" + cardId
 		});
 
 		let questionMark = $("<div></div>").attr({
-			"class": "qm",
+			"class": "qm position-absolute top-50 start-50 translate-middle",
 			"id": "qm" + cardId
 		}).text("?");
 
@@ -81,18 +77,17 @@ function initializeBoard() {
 	}
 }
 
-function onCardHover(e) {
+const onCardHover = (e) => {
 	var hoveredCard = $("#" + e.target.id).parentsUntil(".cards").last();
 	$(hoveredCard).css("cursor", "pointer");
 }
 
-function onCardClick(e) {
+const onCardClick = (e) => {
 	var clickedCard = $("#" + e.target.id).parentsUntil(".cards").last();
 
 	// in case the clicked card is already revealed, we need to unreveal it
 	if ($(clickedCard).attr("class").includes("revealed")) {
 		unreveal(clickedCard);
-
 	} else { //the card is not revealed yet, we need to reveal it
 		reveal(clickedCard);
 	}
@@ -108,10 +103,9 @@ function onCardClick(e) {
     }
 }
 
-function chooseImages() {
+const chooseImages = () => {
 	let imagesLeftToChooseFrom = images.slice();
 	let imagesChosen = new Array(cards/2);
-
 
 	for (let i = 0; i < cards/2; i++) {
 		let randomIndex = (Math.floor(Math.random() * imagesLeftToChooseFrom.length));
@@ -123,7 +117,7 @@ function chooseImages() {
 	return imagesChosen.concat(imagesChosen);
 }
 
-function shuffle(array) {
+const shuffle = (array)=> {
 	let currentIndex = array.length, randomIndex;
 
 	while (currentIndex != 0) {
@@ -138,7 +132,7 @@ function shuffle(array) {
 	return array;
 }
 
-function isAMatch() {
+const isAMatch = () => {
 	let revealedCardEls = getRevealedCards();
 	let card1Img = $(revealedCardEls).eq(0).find(".card-front").css("background-image");
 	let card2Img = $(revealedCardEls).eq(1).find(".card-front").css("background-image");
@@ -154,7 +148,7 @@ function isAMatch() {
 
 		setTimeout(function () {
 			for (let i = 0; i < 2; i++) {
-				revealedCardEls.eq(i).hide();
+				revealedCardEls.eq(i).css('visibility', 'hidden');
 			}
 			if (pairsFound * 2 == cards)
 				setTimeout(onWinning, 500);
@@ -165,19 +159,19 @@ function isAMatch() {
     }
 }
 
-function unreveal(card) {
+const unreveal = (card) => {
 	revealedCards--;
 	$(card).toggleClass("revealed").css("transform", "rotateY(0deg)");
 	console.log("Unrevealed card: " + $(card).attr("id"));
 }
 
-function reveal(card) {
+const reveal = (card) => {
 	revealedCards++;
 	$(card).toggleClass("revealed").css("transform", "rotateY(180deg)");
 	console.log("Revealed card: " + $(card).attr("id"));
 }
 
-function onWinning() {
+const onWinning = () => {
 	clearInterval(intervalHandler);
 	console.log("We have a winner!");
 	confetti({
@@ -191,7 +185,7 @@ function onWinning() {
 
 }
 
-function intervalsHandler() {
+const intervalsHandler = () => {
 	let revealedCardEls = getRevealedCards();
 	if (revealedCardEls.length != revealedCards) {
 		revealedCards = revealedCardEls.length;
@@ -207,10 +201,97 @@ function intervalsHandler() {
 	}
 }
 
-function getRevealedCards() {
+const getRevealedCards = () => {
 	return $(".cards").find(".revealed");
 }
 
-function showWinDialog() {
+const showWinDialog = () => {
 	$(".modal").toggle();
+	stopTimer();
 }
+
+const setGame = () => {
+	playerName = $("#playerName").val();
+	cards =  $("#cards").val();
+	$('#welcome-modal').modal('hide');
+	$('#player').html(playerName);
+	startGame();
+}
+
+const startTimer = () => {
+	const timerElement = $('#timer');
+	let timer = 0, hours, minutes, seconds;
+	intervalId = setInterval(() => {
+	  hours = parseInt(timer / 3600, 10);
+	  minutes = parseInt((timer % 3600) / 60, 10);
+	  seconds = parseInt(timer % 60, 10);
+
+	  hours = hours < 10 ? "0" + hours : hours;
+	  minutes = minutes < 10 ? "0" + minutes : minutes;
+	  seconds = seconds < 10 ? "0" + seconds : seconds;
+
+	  timerElement.html(hours + ":" + minutes + ":" + seconds);
+
+	  timer++;
+	}, 1000);
+  }
+
+  const stopTimer = () => {
+	clearInterval(intervalId);
+  }
+
+  const adjustCardSize = () => {
+	const cardElements = document.querySelectorAll('.cards');
+	const qms = document.querySelectorAll(".qm");
+
+    cardElements.forEach(card => {
+		card.style.setProperty('width', `${cardSize}px`, 'important');
+		card.style.setProperty('height', `${cardSize}px`, 'important'); // Maintain aspect ratio, for example 4:3
+	  });
+
+	  qms.forEach(qm => {
+		qm.style.setProperty('font-size', `${cardSize * 0.6}px`);
+		qm.style.setProperty('line-height', `${cardSize * 0.6 * 1.11}px`);
+		qm.style.setProperty('height', `${cardSize * 0.6}px`);
+	  });
+	  console.log("Adjusted card size!");
+	
+  }
+
+const calculateOptimalCardSize = () => {
+	const boardElement = document.getElementById('board');
+	const boardHeight = boardElement.clientHeight;
+	const boardWidth = boardElement.clientWidth;
+
+    let optimalCardSize = 0;
+	let rows;
+    // Iterate over possible numbers of columns (from 1 up to n)
+    for (let columns = 1; columns <= cards; columns++) {
+        rows = Math.ceil(cards / columns); // Calculate the corresponding number of rows
+
+        // Calculate the size of each card for this configuration
+        const cardSizeByWidth = boardWidth / columns;
+        const cardSizeByHeight = boardHeight / rows;
+
+        // The card size is the minimum of these two dimensions
+        const cardSize = Math.min(cardSizeByWidth, cardSizeByHeight);
+
+        // Check if this configuration is better than the previous best
+        if (cardSize * columns <= boardWidth && cardSize * rows <= boardHeight) {
+            optimalCardSize = Math.max(optimalCardSize, cardSize);
+        }
+    }
+	console.log("Found the optimal card size!");
+
+    cardSize = Math.min(optimalCardSize - 16 - (16/rows), DEFAULT_CARD_SIZE);
+}
+
+window.addEventListener('resize', () => {
+	calculateOptimalCardSize();
+	adjustCardSize();
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+	const button = document.querySelector('.btn');
+	button.addEventListener('click', setGame);
+});

@@ -6,18 +6,9 @@ body{
     margin: 0;
 }
 
-.topnav {
-    background-color: #5CE1E6;
+.navbar {
+    background-color: #5CE1E6 !important;
     height: 50px;
-    width: 100%;
-    margin: 0;
-    padding: 0;
-    top: 0;
-    border-bottom: 1px solid black;
-    color: white;
-    display: grid;
-    grid-template-columns: 100px auto 250px;
-    position: fixed;
 }
 
 #menu {
@@ -31,22 +22,13 @@ body{
     height: 30px;
 }
 
-.topnav *{
-    line-height: 50px;
+.navbar-brand {
+    padding-left: 30px;
+    font-family: 'DM Sans', sans-serif;
+    text-transform: uppercase;
 }
 
-    .topnav #title {
-        padding-left: 30px;
-        font-family: 'DM Sans', sans-serif;
-        text-transform: uppercase;
-    }
-
-    .topnav #level {
-        font-family: 'Roboto Mono', monospace;
-        font-size: x-large;
-    }
-
-    .topnav #menu {
+    .navbar #menu {
         border-right: 1px solid black;
         background-color: #9CFBFF;
         height: 50px;

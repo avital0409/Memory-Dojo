@@ -1,8 +1,5 @@
 ﻿@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300&display=swap');
 
-body {
-}
-
 .pageContent {
     margin: 150px 15% 50px 15%;
 }
@@ -20,18 +17,10 @@ h1 {
     justify-self: center;
 }
 
-#page-title {
-    display: grid;
-    grid-template-columns: 150px auto;
-    justify-content: center;
-}
-
 #board {
     clear: both;
     background-color: #F8F8F8;
-    height: 600px;
-    display: grid;
-    grid-gap: 50px;
+    height: 90%;
 }
 
 .modal {
@@ -73,3 +62,13 @@ h1 {
         text-decoration: none;
         cursor: pointer;
     }
+
+.btn {
+    background-color: #5CE1E6 !important;
+    color: #c1fbfd !important;
+}
+
+.btn:hover {
+    background-color: #c1fbfd !important;
+    color: #5CE1E6 !important;
+}
