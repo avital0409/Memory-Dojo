@@ -41,6 +41,9 @@ let cardSize;
 let activeGame = false;
 
 const board = $("#board");
+const setGameModal = $("#set-game-modal");
+const winModal = $("#win-modal");
+const mainScreen = $("#main-screen");
 
 const initializeBoard = () => {
   let imagesArr = chooseImages();
@@ -58,7 +61,7 @@ const createCards = (chosenImages) => {
     });
 
     let card = $("<div></div>").attr({
-      class: "card w-100 h-100 postion-relative shadow-sm",
+      class: "card w-100 h-100 position-relative shadow-sm",
       id: "card" + cardId,
     });
 
@@ -229,12 +232,11 @@ const toggleGameElements = () => {
 const showWinDialog = () => {
   const title = `🎉 Congratulations, ${playerName}! 🎉`;
   const subtitle = `You've completed the round in ${gameTime}!`;
-  const modal = $("#win-modal");
 
-  modal.find(".modal-title").text(title);
-  modal.find(".modal-subtitle").text(subtitle);
+  winModal.find(".modal-title").text(title);
+  winModal.find(".modal-subtitle").text(subtitle);
 
-  $("#win-modal").modal("show");
+  winModal.modal("show");
   toggleGameElements();
 };
 
@@ -251,7 +253,7 @@ const setGame = () => {
   pairsFound = 0;
   activeGame = true;
   $(".card-placeholder").remove();
-  $("#set-game-modal").modal("hide");
+  setGameModal.modal("hide");
   initializeBoard();
   startTimer();
 };
@@ -319,23 +321,23 @@ const calculateOptimalCardSize = () => {
   cardSize = Math.min(optimalCardSize - 16 - 16 / rows, DEFAULT_CARD_SIZE);
 };
 
-window.addEventListener("resize", () => {
+$(window).on("resize", () => {
   calculateOptimalCardSize();
   adjustCardSize();
 });
 
-document.addEventListener("DOMContentLoaded", () => {
+$(document).on("DOMContentLoaded", () => {
   document.getElementById("playerName").value =
     NAMES[Math.floor(Math.random() * NAMES.length)];
 
-  document.getElementById("play-btn").addEventListener("click", () => {
+  $(document).on("click", "#play-btn", () => {
     playFXSound(btnClickSound);
-    $("#set-game-modal").modal("show");
-    $("#main-screen").toggleClass("d-none");
+    setGameModal.modal("show");
+    mainScreen.toggleClass("d-none");
     playMusic(backgroundMusic);
   });
 
-  document.querySelector("#music-toggle").addEventListener("click", () => {
+  $(document).on("click", "#music-toggle", () => {
     toggleMusic();
     const musicToggle = document.querySelector("#music-toggle");
     if (isMusicOn()) {
@@ -347,7 +349,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  document.querySelector("#sound-toggle").addEventListener("click", () => {
+  $(document).on("click", "#sound-toggle", () => {
     toggleSound();
     const soundToggle = document.querySelector("#sound-toggle");
     if (isSoundOn()) {
@@ -357,11 +359,11 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  document.addEventListener("click", (event) => {
-    if (event.target.classList.contains("btn")) {
-      playFXSound(btnClickSound);
+  $(document).on("click", ".btn", (event) => {
+    playFXSound(btnClickSound);
 
-      if (event.target.matches("#start-game-btn")) {
+    switch (event.target.id) {
+      case "start-game-btn": {
         ("use strict");
         const form = document.querySelectorAll(".needs-validation")[0];
         event.preventDefault();
@@ -371,35 +373,40 @@ document.addEventListener("DOMContentLoaded", () => {
           setGame();
         }
         form.classList.add("was-validated");
-      } else if (event.target.matches("#close-win-modal-btn")) {
+        break;
+      }
+      case "close-win-modal-btn": {
         toggleGameElements();
-        $("#main-screen").toggleClass("d-none");
-      } else if (event.target.matches("#play-win-modal-btn")) {
+        mainScreen.toggleClass("d-none");
+        break;
+      }
+      case "play-win-modal-btn": {
         toggleGameElements();
         setGame();
-      } else if (event.target.matches("#play-with-new-configs-win-modal-btn")) {
-        toggleGameElements();
-        $("#win-modal").modal("hide");
-        $("#set-game-modal").modal("show");
+        break;
       }
+      case "play-with-new-configs-win-modal-btn": {
+        toggleGameElements();
+        winModal.modal("hide");
+        setGameModal.modal("show");
+        break;
+      }
+      default:
+        break;
     }
   });
 
-  document
-    .getElementById("set-game-modal")
-    .addEventListener("hidden.bs.modal", () => {
-      if (!activeGame) {
-        $("#main-screen").toggleClass("d-none");
-      }
-    });
+  $(document).on("hidden.bs.modal", "#set-game-modal", () => {
+    if (!activeGame) {
+      mainScreen.toggleClass("d-none");
+    }
+  });
 
-  document
-    .getElementById("win-modal")
-    .addEventListener("hidden.bs.modal", () => {
-      if (!activeGame) {
-        toggleGameElements();
-      }
-    });
+  $(document).on("hidden.bs.modal", "#win-modal", () => {
+    if (!activeGame) {
+      toggleGameElements();
+    }
+  });
 });
 
 backgroundMusic.loop = true;
