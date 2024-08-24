@@ -1,3 +1,8 @@
+:root {
+    --primary-theme-color: #5CE1E6;
+    --secondary-theme-color: #c1fbfd;
+}
+
 .default-cursor {
     cursor: default;
 }
@@ -7,7 +12,7 @@
 }
 
 .courgette-regular {
-    font-family: "Courgette", cursive;
+    font-family: "Courgette", cursive !important;
     font-weight: 400;
     font-style: normal;
 }
@@ -18,11 +23,25 @@
     font-style: normal;
 }
 
-.font-1 {
+.comfortaa {
+    font-family: "Comfortaa", cursive;
+    font-weight: 400;
+    font-style: normal;
+}
+
+.font-base-size {
     font-size: 1rem;
 }
 
 .font-m { 
-    font-size: 1.5rem;
+    font-size: 1.5rem !important;
 }
 
+.btn {
+    background-color: var(--primary-theme-color) !important;
+}
+
+.btn:hover {
+    background-color: var(--secondary-theme-color) !important;
+    color: var(--primary-theme-color) !important;
+}

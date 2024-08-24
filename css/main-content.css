@@ -1,15 +1,4 @@
-﻿@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300&display=swap');
-
-:root {
-    --primary-color: #5CE1E6;
-    --accent-color: #9CFBFF;
-}
-
-.pageContent {
-    margin: 150px 15% 50px 15%;
-}
-
-body::before {
+﻿body::before {
     content: "";
     position: absolute;
     top: 0;
@@ -24,135 +13,117 @@ body::before {
     opacity: 1;
 }
 
-
-#background {
+#background-elements {
     background-image: url('../images/bg-1.png'), url('../images/bg-2.png');
     background-position: left 0px top 50px, right 0px bottom 0px;
     background-repeat: no-repeat, no-repeat;
     background-size: auto, auto;
-    position: relative;
 }
 
-#start {
-    width: 400px;
+.navbar {
+    height: 3.125rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+    color: #ffffff;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.05));
+    backdrop-filter: blur(15px);
+  }
+  
+  #music-toggle:hover, #sound-toggle:hover {
+    color: #5CE1E6;
+  }
+  
+  .logo {
+    font-size: 2rem;
+    color: #43811b
+  }
+  
+  #timer {
+    width: 4.375rem;
+  }
+
+/* Welcome modal (start a new game with settings) */
+#set-game-modal {
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(5px);
 }
 
-h1 {
-    font-family: 'Roboto Mono', monospace;
-    font-weight: 300;
-    text-align: center;
-    font-size: 50px;
-}
-
-#btn-start-game {
-    padding: 12px 24px;
-    font-size: 18px;
-    background-color: #42c8f5;
-    color: white;
-    border-radius: 10px;
-    transition: background-color 0.2s ease;
-}
-
-#btn-start-game:hover {
-    background-color: #35b2e0;
-}
-
-#welcome-modal label {
-    font-size: 16px;
+#set-game-modal label {
     font-weight: 500;
 }
 
-#welcome-modal input {
-    font-size: 16px;
-    padding: 8px;
-    border-radius: 5px;
-}
-
-#welcome-modal {
-    background: rgba(255, 255, 255, 0.25);
-    backdrop-filter: blur(5px);
-    border-radius: 10px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-}
-
+/* Game components */
 #board {
-    clear: both;
     background-color: #F8F8F8;
     height: 90%;
 }
 
-@media (min-width: 850px) {
+@media (min-width: 53.125rem) {
     #board {
-        width: 850px;
+        width: 53.125rem;
     }
   }
 
-.modal {
-    display: none;
-    position: fixed;
-    z-index: 1;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-}
 
-.closeDialog {
-    background-color: #5CE1E6;
-    color: #9CFBFF;
-    margin: 0;
-    font-size: 28px;
-    font-weight: bold;
-    line-height: 50px;
-}
-
-    .closeDialog:hover,
-    .closeDialog:focus {
-        color: #5CE1E6;
-        background-color: #9CFBFF;
-        text-decoration: none;
-        cursor: pointer;
-    }
-
-.btn {
-    background-color: #5CE1E6 !important;
-}
-
-.btn:hover {
-    background-color: #c1fbfd !important;
-    color: #5CE1E6 !important;
-}
-
-#play-icon { 
-    font-size: 70px;
-}
-
-#start {
-    background: rgba(255, 255, 255, 0.25);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    padding: 20px 40px;
-}
-
-.beach-memories {
-    text-shadow: 0 1px 0 #ccc,0 2px 0 #c9c9c9,0 3px 0 #bbb,0 4px 0 #b9b9b9,0 5px 0 #aaa,0 6px 1px rgba(0,0,0,.1),0 0 5px rgba(0,0,0,.1),0 1px 3px rgba(0,0,0,.3),0 3px 5px rgba(0,0,0,.2),0 5px 10px rgba(0,0,0,.25),0 10px 10px rgba(0,0,0,.2),0 20px 20px rgba(0,0,0,.15);
-}
-
-#btn-play {
-    transition: transform 2s ease;
-    background: linear-gradient(145deg, #a6e3f3, #6fd5e0);
-}
-
-#btn-play:hover {
-    transform: scale(1.05);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-}
-
+/* Win Modal*/
 #win-modal .btn {
     transition: background-color 0.2s ease, transform 0.2s ease;
 }
 
-#win-modal .btn:hover {
+#win-modal .btn:hover,
+#win-modal .btn:active {
     transform: scale(1.05);
 }
+
+.btn-group {
+    color: #9CFBFF;
+    line-height: 3.125rem;
+}
+
+/* Main screen */
+#main-screen {
+    min-width: 27.75rem;
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.beach-memories {
+    text-shadow: 0 1px 0 #ccc,0 2px 0 #c9c9c9,0 3px 0 #bbb,0 4px 0 #b9b9b9,0 5px 0 #aaa,0 6px 1px rgba(0,0,0,.1),0 0 5px rgba(0,0,0,.1),0 1px 3px rgba(0,0,0,.3),0 3px 5px rgba(0,0,0,.2),0 5px 10px rgba(0,0,0,.25),0 10px 10px rgba(0,0,0,.2),0 20px 20px rgba(0,0,0,.15);
+    font-size: 75px !important;
+    line-height: 90%;
+}
+
+#play-icon { 
+    font-size: 4.375rem;
+}
+
+#play-btn {
+    width: 95%;
+    transition: transform 2s ease;
+    background: linear-gradient(145deg, #a6e3f3, #6fd5e0);
+}
+
+#play-btn:hover {
+    transform: scale(1.05);
+}
+
+@media (max-width: 39rem) {
+    #main-screen {
+        width: 90% !important;
+        height: auto !important;
+    }
+
+    .beach-memories {
+        font-size: 4.6875rem !important;
+        line-height: 90%;
+    }
+
+    #play-btn {
+        width: 100% !important;
+    }
+
+    .logo {
+        font-size: 1.5rem;
+      }
+  }
