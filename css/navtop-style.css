@@ -1,35 +1,17 @@
-﻿
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap');
-
-body{
-    margin: 0;
+﻿.navbar {
+  height: 3.125rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.05));
+  backdrop-filter: blur(15px);
 }
 
-.navbar {
-    background-color: #5CE1E6 !important;
-    height: 50px;
+#music-toggle:hover {
+  color: #5CE1E6;
 }
 
-#menu {
-    display: flex;
-    justify-content: center;
+.logo {
+  font-size: 2rem;
+  color: #43811b
 }
-
-#hamburger {
-    margin: auto;
-    width: 30px;
-    height: 30px;
-}
-
-.navbar-brand {
-    padding-left: 30px;
-    font-family: 'DM Sans', sans-serif;
-    text-transform: uppercase;
-}
-
-    .navbar #menu {
-        border-right: 1px solid black;
-        background-color: #9CFBFF;
-        height: 50px;
-    }

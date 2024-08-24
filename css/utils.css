@@ -1,0 +1,28 @@
+.default-cursor {
+    cursor: default;
+}
+
+.pointer {
+    cursor: pointer;
+}
+
+.courgette-regular {
+    font-family: "Courgette", cursive;
+    font-weight: 400;
+    font-style: normal;
+}
+
+.pacifico-regular {
+    font-family: "Pacifico", cursive;
+    font-weight: 400;
+    font-style: normal;
+}
+
+.font-1 {
+    font-size: 1rem;
+}
+
+.font-m { 
+    font-size: 1.5rem;
+}
+

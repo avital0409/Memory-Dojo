@@ -1,24 +1,26 @@
 ﻿import { images } from './assets.js';
 
 const DEFAULT_CARD_SIZE = 150;
+const NAMES = ['Knight Titus', ' Tropical Breeze', 'Sandy Waves', 'Sunny Splash', 'Beach Bliss', 'Mango Twist', 'Coral Sunset', 'Ocean Chill', 'Pineapple Fizz'];
 
 let playerName;
 let cards;
 let revealedCards = 0;
 let pairsFound = 0;
-let intervalHandler;
-let intervalId;
+let gameTimerIntervalID;
+let gameTime;
 let cardSize;
+let activeGame = false;
+let music = true;
+const board = $("#board");
 
-const startGame = (e) => {
-	if (e != null) {
-		$(".cards").remove();
-		$(".modal").hide();
-	}
+const startGame = () => {
 	revealedCards = 0;
 	pairsFound = 0;
+	activeGame = true;
+	$(".cards").remove();
+	$(".modal").hide();
 	initializeBoard();
-	intervalHandler = setInterval(intervalsHandler, 2000);
 	startTimer();
 }
 
@@ -31,8 +33,6 @@ const initializeBoard = () => {
 }
 
 const createCards = (chosenImages) => {
-	const board = $("#board");
-
 	for (let cardId = 1; cardId <= cards; cardId++) {
 		let cardScene = $("<div></div>").attr({
 			"class": "cards m-0",
@@ -84,23 +84,26 @@ const onCardHover = (e) => {
 
 const onCardClick = (e) => {
 	var clickedCard = $("#" + e.target.id).parentsUntil(".cards").last();
-
+	console.log("revealed cards: " + revealedCards);
 	// in case the clicked card is already revealed, we need to unreveal it
 	if ($(clickedCard).attr("class").includes("revealed")) {
 		unreveal(clickedCard);
-	} else { //the card is not revealed yet, we need to reveal it
+	} else if (revealedCards < 2) { //the card is not revealed yet, we need to reveal it
 		reveal(clickedCard);
 	}
 
 	if (revealedCards == 2) {
 		if (!isAMatch()) {
-			let revealedCardEls = getRevealedCards();
-			setTimeout(function () {
-				unreveal($(revealedCardEls).eq(0));
-				unreveal($(revealedCardEls).eq(1));
+			setTimeout(() => {
+				getRevealedCards().each(function () {
+					unreveal($(this))
+				});
 			}, 500);
+		} else {
+			if (pairsFound * 2 == cards)
+				setTimeout(onWinning, 500);
 		}
-    }
+  }
 }
 
 const chooseImages = () => {
@@ -137,7 +140,6 @@ const isAMatch = () => {
 	let card1Img = $(revealedCardEls).eq(0).find(".card-front").css("background-image");
 	let card2Img = $(revealedCardEls).eq(1).find(".card-front").css("background-image");
 
-
 	if (card1Img === card2Img) {
 		revealedCards -= 2;
 		pairsFound++;
@@ -146,12 +148,10 @@ const isAMatch = () => {
 			revealedCardEls.eq(i).toggleClass("revealed");
 		}
 
-		setTimeout(function () {
+		setTimeout(() => {
 			for (let i = 0; i < 2; i++) {
 				revealedCardEls.eq(i).css('visibility', 'hidden');
 			}
-			if (pairsFound * 2 == cards)
-				setTimeout(onWinning, 500);
 		}, 1000);
 		return true;
 	} else {
@@ -172,7 +172,7 @@ const reveal = (card) => {
 }
 
 const onWinning = () => {
-	clearInterval(intervalHandler);
+	activeGame = false;
 	console.log("We have a winner!");
 	confetti({
 		particleCount: 150,
@@ -182,23 +182,6 @@ const onWinning = () => {
 		}
 	});
 	setTimeout(showWinDialog);
-
-}
-
-const intervalsHandler = () => {
-	let revealedCardEls = getRevealedCards();
-	if (revealedCardEls.length != revealedCards) {
-		revealedCards = revealedCardEls.length;
-		if (revealedCards == 2) {
-			if (!isAMatch()) {
-				setTimeout(function () {
-					unreveal($(revealedCardEls).eq(0));
-					unreveal($(revealedCardEls).eq(1));
-				}, 500);
-			}
-		}
-
-	}
 }
 
 const getRevealedCards = () => {
@@ -206,13 +189,27 @@ const getRevealedCards = () => {
 }
 
 const showWinDialog = () => {
-	$(".modal").toggle();
 	stopTimer();
+	activeGame = false;
+	generateWinDialogContent();
+	$("#win-modal").modal('show');
+	$('#board').toggleClass('d-none');
+}
+
+const generateWinDialogContent = () => {
+	const title = '🎉 Congratulations, ' + playerName + '! 🎉';
+	const subtitle = 'You\'ve completed the round in ' + gameTime + '!'
+
+	const $modal = $('#win-modal');
+	$modal.find('.modal-title').text(title);
+	$modal.find('.modal-subtitle').text(subtitle);
 }
 
 const setGame = () => {
 	playerName = $("#playerName").val();
 	cards =  $("#cards").val();
+	activeGame = true;
+	$('#board').toggleClass('d-none');
 	$('#welcome-modal').modal('hide');
 	$('#player').html(playerName);
 	startGame();
@@ -221,7 +218,7 @@ const setGame = () => {
 const startTimer = () => {
 	const timerElement = $('#timer');
 	let timer = 0, hours, minutes, seconds;
-	intervalId = setInterval(() => {
+	gameTimerIntervalID = setInterval(() => {
 	  hours = parseInt(timer / 3600, 10);
 	  minutes = parseInt((timer % 3600) / 60, 10);
 	  seconds = parseInt(timer % 60, 10);
@@ -230,14 +227,15 @@ const startTimer = () => {
 	  minutes = minutes < 10 ? "0" + minutes : minutes;
 	  seconds = seconds < 10 ? "0" + seconds : seconds;
 
-	  timerElement.html(hours + ":" + minutes + ":" + seconds);
+		gameTime = hours + ":" + minutes + ":" + seconds;
+	  timerElement.html(gameTime);
 
 	  timer++;
 	}, 1000);
   }
 
   const stopTimer = () => {
-	clearInterval(intervalId);
+	clearInterval(gameTimerIntervalID);
   }
 
   const adjustCardSize = () => {
@@ -246,7 +244,7 @@ const startTimer = () => {
 
     cardElements.forEach(card => {
 		card.style.setProperty('width', `${cardSize}px`, 'important');
-		card.style.setProperty('height', `${cardSize}px`, 'important'); // Maintain aspect ratio, for example 4:3
+		card.style.setProperty('height', `${cardSize}px`, 'important');
 	  });
 
 	  qms.forEach(qm => {
@@ -265,18 +263,12 @@ const calculateOptimalCardSize = () => {
 
     let optimalCardSize = 0;
 	let rows;
-    // Iterate over possible numbers of columns (from 1 up to n)
     for (let columns = 1; columns <= cards; columns++) {
-        rows = Math.ceil(cards / columns); // Calculate the corresponding number of rows
-
-        // Calculate the size of each card for this configuration
+        rows = Math.ceil(cards / columns);
         const cardSizeByWidth = boardWidth / columns;
         const cardSizeByHeight = boardHeight / rows;
-
-        // The card size is the minimum of these two dimensions
         const cardSize = Math.min(cardSizeByWidth, cardSizeByHeight);
 
-        // Check if this configuration is better than the previous best
         if (cardSize * columns <= boardWidth && cardSize * rows <= boardHeight) {
             optimalCardSize = Math.max(optimalCardSize, cardSize);
         }
@@ -292,6 +284,61 @@ window.addEventListener('resize', () => {
 });
 
 document.addEventListener('DOMContentLoaded', () => {
-	const button = document.querySelector('.btn');
-	button.addEventListener('click', setGame);
+	document.getElementById('playerName').value = NAMES[Math.floor(Math.random() * NAMES.length)];
+	document.getElementById('start').addEventListener('click', () => {
+		$('#welcome-modal').modal('show');
+		$('#start').toggleClass('d-none');
+	});
+	document.querySelector('#btn-start-game').addEventListener('click', (event) => {
+		'use strict'
+
+		var form = document.querySelectorAll('.needs-validation')[0];
+		event.preventDefault();
+		if (!form.checkValidity()) {
+			event.stopPropagation()
+		} else {
+			setGame();
+		}
+
+		form.classList.add('was-validated')
+	});
+
+	document.querySelector('#btn-close-modal').addEventListener('click', () => {
+		$('#start').toggleClass('d-none');
+		$('#board').toggleClass('d-none');
+	});
+	document.querySelector('#btn-next-game').addEventListener('click', () => {
+		$('#board').toggleClass('d-none');
+		setGame();
+	});
+	document.querySelector('#btn-next-game-configs').addEventListener('click', () =>	{
+		$('#board').toggleClass('d-none');
+		$("#win-modal").hide();
+		$('#welcome-modal').modal('show');
+	});
+	document.querySelector('#music-toggle').addEventListener('click', () => {
+		music = !music;
+		const musicToggle = document.querySelector('#music-toggle');
+		const backgroundSound = document.getElementById('background-sound');
+		if (music) {
+			musicToggle.innerHTML = 'music_note';
+			backgroundSound.play();
+		} else {
+			musicToggle.innerHTML = 'music_off';
+			backgroundSound.pause();
+		}
+	});
+
+	document.getElementById('welcome-modal').addEventListener('hidden.bs.modal', () => {
+			if (!activeGame) {
+				$('#start').toggleClass('d-none');
+			}
+	});
+
+	document.getElementById('win-modal').addEventListener('hidden.bs.modal', () => {
+		if (!activeGame) {
+			$('#board').toggleClass('d-none');
+		}
+});
+
 });

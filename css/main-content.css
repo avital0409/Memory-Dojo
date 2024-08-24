@@ -1,7 +1,40 @@
 ﻿@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300&display=swap');
 
+:root {
+    --primary-color: #5CE1E6;
+    --accent-color: #9CFBFF;
+}
+
 .pageContent {
     margin: 150px 15% 50px 15%;
+}
+
+body::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('../images/background.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    z-index: -1;
+    opacity: 1;
+}
+
+
+#background {
+    background-image: url('../images/bg-1.png'), url('../images/bg-2.png');
+    background-position: left 0px top 50px, right 0px bottom 0px;
+    background-repeat: no-repeat, no-repeat;
+    background-size: auto, auto;
+    position: relative;
+}
+
+#start {
+    width: 400px;
 }
 
 h1 {
@@ -11,10 +44,35 @@ h1 {
     font-size: 50px;
 }
 
-#logo{
-    width: 100px;
-    height: 100px;
-    justify-self: center;
+#btn-start-game {
+    padding: 12px 24px;
+    font-size: 18px;
+    background-color: #42c8f5;
+    color: white;
+    border-radius: 10px;
+    transition: background-color 0.2s ease;
+}
+
+#btn-start-game:hover {
+    background-color: #35b2e0;
+}
+
+#welcome-modal label {
+    font-size: 16px;
+    font-weight: 500;
+}
+
+#welcome-modal input {
+    font-size: 16px;
+    padding: 8px;
+    border-radius: 5px;
+}
+
+#welcome-modal {
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(5px);
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
 #board {
@@ -22,6 +80,12 @@ h1 {
     background-color: #F8F8F8;
     height: 90%;
 }
+
+@media (min-width: 850px) {
+    #board {
+        width: 850px;
+    }
+  }
 
 .modal {
     display: none;
@@ -32,23 +96,11 @@ h1 {
     width: 100%;
     height: 100%;
     overflow: auto;
-    background-color: rgb(0,0,0);
-    background-color: rgba(0,0,0,0.4);
-}
-
-.modalContent {
-    font-family: 'Roboto Mono', monospace;
-    background-color: #fefefe;
-    margin: 20% auto;
-    border: 1px solid #888;
-    width: 50%;
-    text-align: center;
 }
 
 .closeDialog {
     background-color: #5CE1E6;
     color: #9CFBFF;
-    width: 100%;
     margin: 0;
     font-size: 28px;
     font-weight: bold;
@@ -65,10 +117,42 @@ h1 {
 
 .btn {
     background-color: #5CE1E6 !important;
-    color: #c1fbfd !important;
 }
 
 .btn:hover {
     background-color: #c1fbfd !important;
     color: #5CE1E6 !important;
+}
+
+#play-icon { 
+    font-size: 70px;
+}
+
+#start {
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    padding: 20px 40px;
+}
+
+.beach-memories {
+    text-shadow: 0 1px 0 #ccc,0 2px 0 #c9c9c9,0 3px 0 #bbb,0 4px 0 #b9b9b9,0 5px 0 #aaa,0 6px 1px rgba(0,0,0,.1),0 0 5px rgba(0,0,0,.1),0 1px 3px rgba(0,0,0,.3),0 3px 5px rgba(0,0,0,.2),0 5px 10px rgba(0,0,0,.25),0 10px 10px rgba(0,0,0,.2),0 20px 20px rgba(0,0,0,.15);
+}
+
+#btn-play {
+    transition: transform 2s ease;
+    background: linear-gradient(145deg, #a6e3f3, #6fd5e0);
+}
+
+#btn-play:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+#win-modal .btn {
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+#win-modal .btn:hover {
+    transform: scale(1.05);
 }
