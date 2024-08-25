@@ -35,3 +35,11 @@ export const images = [
     "images/cards/WaterPistol.png",
     "images/cards/Bucket.png",
 ];
+
+export const audio = {
+	click: new Audio("sounds/mixkit-game-ball-tap-2073.wav"),
+	flip: new Audio("sounds/420686-Card-Game-Movement-Deal-Single-Whoosh-Light-02.wav"),
+	match: new Audio("sounds/mixkit-video-game-treasure-2066.wav"),
+	win: new Audio("sounds/mixkit-completion-of-a-level-2063.wav"),
+	background: new Audio("sounds/cute-creatures-150622.mp3")
+};

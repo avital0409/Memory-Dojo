@@ -1,25 +1,9 @@
-﻿import { images } from "./assets.js";
-import {
-  isMusicOn,
-  isSoundOn,
-  toggleMusic,
-  toggleSound,
-  playFXSound,
-  playFXSoundAndDimMusic,
-  playMusic,
-  pauseMusic,
-} from "./sounds.js";
+﻿import { audio } from "./assets.js";
+import { SoundManager } from "./soundManager.js"
+import { GameState, GameStateManager } from "./gameStateManager.js";
+import { GamePlay } from "./gamePlay.js";
 
-const btnClickSound = new Audio("sounds/mixkit-game-ball-tap-2073.wav");
-const matchSound = new Audio("sounds/mixkit-video-game-treasure-2066.wav");
-const winSound = new Audio("sounds/mixkit-completion-of-a-level-2063.wav");
-const cardFlipSound = new Audio(
-  "sounds/420686-Card-Game-Movement-Deal-Single-Whoosh-Light-02.wav"
-);
-const backgroundMusic = new Audio("sounds/cute-creatures-150622.mp3");
-
-const DEFAULT_CARD_SIZE = 150;
-const NAMES = [
+const NAME_SUGGESTIONS = [
   "Knight Titus",
   "Tropical Breeze",
   "Sandy Waves",
@@ -31,185 +15,9 @@ const NAMES = [
   "Pineapple Fizz",
 ];
 
-let playerName;
-let cards;
-let revealedCards = 0;
-let pairsFound = 0;
-let gameTimerIntervalID;
-let gameTime;
-let cardSize;
-let activeGame = false;
-
-const board = $("#board");
-const setGameModal = $("#set-game-modal");
-const winModal = $("#win-modal");
-const mainScreen = $("#main-screen");
-
-const initializeBoard = () => {
-  let imagesArr = chooseImages();
-  shuffle(imagesArr);
-  createCards(imagesArr);
-  calculateOptimalCardSize();
-  adjustCardSize();
-};
-
-const createCards = (chosenImages) => {
-  for (let cardId = 1; cardId <= cards; cardId++) {
-    let cardScene = $("<div></div>").attr({
-      class: "card-placeholder m-0 bg-transparent",
-      id: "card-placeholder" + cardId,
-    });
-
-    let card = $("<div></div>").attr({
-      class: "card w-100 h-100 position-relative shadow-sm",
-      id: "card" + cardId,
-    });
-
-    let cardFront = $("<div></div>")
-      .attr({
-        class: "card-front w-100 h-100 bg-white position-absolute rounded",
-        id: "card" + cardId + "Front",
-      })
-      .css("background-image", "url(" + chosenImages[cardId - 1] + ")")
-      .css("background-size", "contain");
-
-    let cardBack = $("<div></div>").attr({
-      class:
-        "card-back w-100 h-100 position-relative border border-white border-4 rounded",
-      id: "card" + cardId + "Back",
-    });
-
-    let cardBackDrawing = $("<div></div>").attr({
-      class:
-        "card-back-drawing position-absolute w-75 h-75 rounded-circle top-50 start-50 translate-middle",
-      id: "card-back-drawing" + cardId,
-    });
-
-    let questionMark = $("<div></div>")
-      .attr({
-        class:
-          "qm position-absolute top-50 start-50 translate-middle text-white comfortaa text-center",
-        id: "qm" + cardId,
-      })
-      .text("?");
-
-    cardBackDrawing.append(questionMark);
-    cardBack.append(cardBackDrawing);
-    card.append(cardBack);
-    card.append(cardFront);
-    cardScene.append(card);
-    board.append(cardScene);
-    card.hover(onCardHover);
-    card.click(onCardClick);
-  }
-};
-
-const onCardHover = (e) => {
-  var hoveredCard = $("#" + e.target.id)
-    .parentsUntil(".card-placeholder")
-    .last();
-  $(hoveredCard).css("cursor", "pointer");
-};
-
-const onCardClick = (e) => {
-  var clickedCard = $("#" + e.target.id)
-    .parentsUntil(".card-placeholder")
-    .last();
-
-  playFXSound(cardFlipSound);
-
-  if ($(clickedCard).attr("class").includes("revealed")) {
-    unreveal(clickedCard);
-  } else if (revealedCards < 2) {
-    reveal(clickedCard);
-  }
-
-  if (revealedCards == 2) {
-    if (!isAMatch()) {
-      setTimeout(() => {
-        getRevealedCards().each(function () {
-          unreveal($(this));
-        });
-      }, 500);
-    } else {
-      if (pairsFound * 2 == cards) setTimeout(onWinning, 500);
-    }
-  }
-};
-
-const chooseImages = () => {
-  let imagesLeftToChooseFrom = [...images];
-  let imagesChosen = new Array(cards / 2);
-
-  for (let i = 0; i < cards / 2; i++) {
-    let randomIndex = Math.floor(Math.random() * imagesLeftToChooseFrom.length);
-    imagesChosen[i] = imagesLeftToChooseFrom[randomIndex].slice();
-    imagesLeftToChooseFrom.splice(randomIndex, 1);
-  }
-
-  return imagesChosen.concat(imagesChosen);
-};
-
-const shuffle = (array) => {
-  let currentIndex = array.length,
-    randomIndex;
-
-  while (currentIndex != 0) {
-    randomIndex = Math.floor(Math.random() * currentIndex);
-    currentIndex--;
-    [array[currentIndex], array[randomIndex]] = [
-      array[randomIndex],
-      array[currentIndex],
-    ];
-  }
-
-  return array;
-};
-
-const isAMatch = () => {
-  let revealedCardEls = getRevealedCards();
-  let card1Img = $(revealedCardEls)
-    .eq(0)
-    .find(".card-front")
-    .css("background-image");
-  let card2Img = $(revealedCardEls)
-    .eq(1)
-    .find(".card-front")
-    .css("background-image");
-
-  if (card1Img === card2Img) {
-    playFXSound(matchSound);
-    revealedCards -= 2;
-    pairsFound++;
-    for (let i = 0; i < 2; i++) {
-      revealedCardEls.eq(i).toggleClass("revealed");
-    }
-
-    setTimeout(() => {
-      for (let i = 0; i < 2; i++) {
-        revealedCardEls.eq(i).css("visibility", "hidden");
-      }
-    }, 1000);
-    return true;
-  } else {
-    return false;
-  }
-};
-
-const unreveal = (card) => {
-  revealedCards--;
-  $(card).toggleClass("revealed").css("transform", "rotateY(0deg)");
-};
-
-const reveal = (card) => {
-  revealedCards++;
-  $(card).toggleClass("revealed").css("transform", "rotateY(180deg)");
-};
-
-const onWinning = () => {
-  activeGame = false;
-  stopTimer();
-  playFXSoundAndDimMusic(winSound, backgroundMusic);
+export const onWinning = () => {
+  GamePlay.endGame();
+  SoundManager.playFXSoundAndDimMusic(audio.win, audio.background);
   confetti({
     particleCount: 150,
     spread: 100,
@@ -220,139 +28,49 @@ const onWinning = () => {
   setTimeout(showWinDialog);
 };
 
-const getRevealedCards = () => {
-  return $(".card-placeholder").find(".revealed");
-};
-
-const toggleGameElements = () => {
-  $("#board").toggleClass("d-none");
-  $("#timer").toggleClass("d-none");
-};
-
 const showWinDialog = () => {
-  const title = `🎉 Congratulations, ${playerName}! 🎉`;
-  const subtitle = `You've completed the round in ${gameTime}!`;
+  const winModal = $("#win-modal");
+  const title = `🎉 Congratulations, ${GamePlay.getPlayerName()}! 🎉`;
+  const subtitle = `You've completed the round in ${GamePlay.getGameDuration()}!`;
 
   winModal.find(".modal-title").text(title);
   winModal.find(".modal-subtitle").text(subtitle);
 
-  winModal.modal("show");
-  toggleGameElements();
+  GameStateManager.setState(GameState.WIN_SCREEN);
 };
 
-const setGameSettings = () => {
-  playerName = $("#playerName").val();
-  cards = $("#cards").val();
-  $("#player").html(playerName);
-};
+$(() => {
+  GameStateManager.setState(GameState.MAIN_SCREEN);
 
-const setGame = () => {
-  setGameSettings();
-  toggleGameElements();
-  revealedCards = 0;
-  pairsFound = 0;
-  activeGame = true;
-  $(".card-placeholder").remove();
-  setGameModal.modal("hide");
-  initializeBoard();
-  startTimer();
-};
-
-const startTimer = () => {
-  let timer = 0,
-    hours,
-    minutes,
-    seconds;
-
-  gameTimerIntervalID = setInterval(() => {
-    hours = parseInt(timer / 3600, 10);
-    minutes = parseInt((timer % 3600) / 60, 10);
-    seconds = parseInt(timer % 60, 10);
-
-    hours = hours < 10 ? "0" + hours : hours;
-    minutes = minutes < 10 ? "0" + minutes : minutes;
-    seconds = seconds < 10 ? "0" + seconds : seconds;
-
-    gameTime = hours + ":" + minutes + ":" + seconds;
-    $("#timer").html(gameTime);
-
-    timer++;
-  }, 1000);
-};
-
-const stopTimer = () => {
-  clearInterval(gameTimerIntervalID);
-};
-
-const adjustCardSize = () => {
-  const cardElements = document.querySelectorAll(".card-placeholder");
-  const qms = document.querySelectorAll(".qm");
-
-  cardElements.forEach((card) => {
-    card.style.setProperty("width", `${cardSize / 16}rem`, "important");
-    card.style.setProperty("height", `${cardSize / 16}rem`, "important");
-  });
-
-  qms.forEach((qm) => {
-    qm.style.setProperty("font-size", `${(cardSize * 0.6) / 16}rem`);
-    qm.style.setProperty("line-height", `${(cardSize * 0.6 * 1.11) / 16}rem`);
-    qm.style.setProperty("height", `${(cardSize * 0.6) / 16}rem`);
-  });
-};
-
-const calculateOptimalCardSize = () => {
-  const boardElement = document.getElementById("board");
-  const boardHeight = boardElement.clientHeight;
-  const boardWidth = boardElement.clientWidth;
-
-  let optimalCardSize = 0;
-  let rows;
-  for (let columns = 1; columns <= cards; columns++) {
-    rows = Math.ceil(cards / columns);
-    const cardSizeByWidth = boardWidth / columns;
-    const cardSizeByHeight = boardHeight / rows;
-    const cardSize = Math.min(cardSizeByWidth, cardSizeByHeight);
-
-    if (cardSize * columns <= boardWidth && cardSize * rows <= boardHeight) {
-      optimalCardSize = Math.max(optimalCardSize, cardSize);
-    }
-  }
-
-  cardSize = Math.min(optimalCardSize - 16 - 16 / rows, DEFAULT_CARD_SIZE);
-};
-
-$(window).on("resize", () => {
-  calculateOptimalCardSize();
-  adjustCardSize();
-});
-
-$(document).on("DOMContentLoaded", () => {
   document.getElementById("playerName").value =
-    NAMES[Math.floor(Math.random() * NAMES.length)];
+    NAME_SUGGESTIONS[Math.floor(Math.random() * NAME_SUGGESTIONS.length)];
 
   $(document).on("click", "#play-btn", () => {
-    playFXSound(btnClickSound);
-    setGameModal.modal("show");
-    mainScreen.toggleClass("d-none");
-    playMusic(backgroundMusic);
+    SoundManager.playFXSound(audio.click);
+    SoundManager.playMusic(audio.background);
+    GameStateManager.setState(GameState.GAME_CONFIGS);
+  });
+
+  $(document).on("click", "#close-configs-btn", () => {
+    GameStateManager.setState(GameState.MAIN_SCREEN);
   });
 
   $(document).on("click", "#music-toggle", () => {
-    toggleMusic();
+    SoundManager.toggleMusic();
     const musicToggle = document.querySelector("#music-toggle");
-    if (isMusicOn()) {
+    if (SoundManager.isMusicOn()) {
       musicToggle.innerHTML = "music_note";
-      playMusic(backgroundMusic);
+      SoundManager.playMusic(audio.background);
     } else {
       musicToggle.innerHTML = "music_off";
-      pauseMusic(backgroundMusic);
+      SoundManager.pauseMusic(audio.background);
     }
   });
 
   $(document).on("click", "#sound-toggle", () => {
-    toggleSound();
+    SoundManager.toggleSound();
     const soundToggle = document.querySelector("#sound-toggle");
-    if (isSoundOn()) {
+    if (SoundManager.isSoundOn()) {
       soundToggle.innerHTML = "volume_up";
     } else {
       soundToggle.innerHTML = "volume_off";
@@ -360,7 +78,7 @@ $(document).on("DOMContentLoaded", () => {
   });
 
   $(document).on("click", ".btn", (event) => {
-    playFXSound(btnClickSound);
+    SoundManager.playFXSound(audio.click);
 
     switch (event.target.id) {
       case "start-game-btn": {
@@ -370,43 +88,27 @@ $(document).on("DOMContentLoaded", () => {
         if (!form.checkValidity()) {
           event.stopPropagation();
         } else {
-          setGame();
+          GameStateManager.setState(GameState.PLAYING);
         }
         form.classList.add("was-validated");
         break;
       }
       case "close-win-modal-btn": {
-        toggleGameElements();
-        mainScreen.toggleClass("d-none");
+        GameStateManager.setState(GameState.MAIN_SCREEN);
         break;
       }
       case "play-win-modal-btn": {
-        toggleGameElements();
-        setGame();
+        GameStateManager.setState(GameState.PLAYING);
         break;
       }
       case "play-with-new-configs-win-modal-btn": {
-        toggleGameElements();
-        winModal.modal("hide");
-        setGameModal.modal("show");
+        GameStateManager.setState(GameState.GAME_CONFIGS);
         break;
       }
       default:
         break;
     }
   });
-
-  $(document).on("hidden.bs.modal", "#set-game-modal", () => {
-    if (!activeGame) {
-      mainScreen.toggleClass("d-none");
-    }
-  });
-
-  $(document).on("hidden.bs.modal", "#win-modal", () => {
-    if (!activeGame) {
-      toggleGameElements();
-    }
-  });
 });
 
-backgroundMusic.loop = true;
+audio.background.loop = true;

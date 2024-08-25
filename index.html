@@ -48,12 +48,12 @@
             </div>
         </div>
     </div>
-    <div class="modal fade rounded" data-bs-backdrop="false" id="set-game-modal" tabindex="-1">
+    <div class="modal fade rounded"data-bs-backdrop="false" id="set-game-modal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
             <h5 class="modal-title">👋🏻 Welcome to <span class="pacifico-regular">Beach memories!</span></h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <button type="button" id="close-configs-btn" class="btn-close" data-bs-dismiss="modal" data-bs-keyboard="false" aria-label="Close"></button>
             </div>
             <form class="modal-body vstack gap-4 needs-validation" novalidate>
                 <div class="vstack gap-3 gap-3">
@@ -71,7 +71,7 @@
         </div>
         </div>
     </div>
-    <div class="modal" id="win-modal" data-bs-backdrop="false" tabindex="-1">
+    <div class="modal" id="win-modal" data-bs-backdrop="false" data-bs-keyboard="false" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content font-base-size">
             <form class="modal-body vstack gap-3 text-center">
@@ -92,7 +92,6 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
     <script src="https://code.jquery.com/jquery-3.1.1.js"></script>
     <script src="scripts/main.js" type="module"></script>
-    <script src="scripts/backgroundEffects.js" type="module"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
 </body>
 </html>
