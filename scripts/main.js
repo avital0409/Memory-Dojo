@@ -1,49 +1,50 @@
 ﻿import { audio } from "./assets.js";
-import { SoundManager } from "./soundManager.js"
+import { SoundManager } from "./soundManager.js";
 import { GameState, GameStateManager } from "./gameStateManager.js";
 import { GamePlay } from "./gamePlay.js";
-
-const NAME_SUGGESTIONS = [
-  "Knight Titus",
-  "Tropical Breeze",
-  "Sandy Waves",
-  "Sunny Splash",
-  "Beach Bliss",
-  "Mango Twist",
-  "Coral Sunset",
-  "Ocean Chill",
-  "Pineapple Fizz",
-];
+import { UIManager } from "./uiManager.js";
 
 export const onWinning = () => {
-  GamePlay.endGame();
+  GamePlay.stopGame();
+  UIManager.announceWinning();
   SoundManager.playFXSoundAndDimMusic(audio.win, audio.background);
-  confetti({
-    particleCount: 150,
-    spread: 100,
-    origin: {
-      y: 0.75,
-    },
-  });
-  setTimeout(showWinDialog);
+  GameStateManager.setState(GameState.WIN_SCREEN);
 };
 
-const showWinDialog = () => {
-  const winModal = $("#win-modal");
-  const title = `🎉 Congratulations, ${GamePlay.getPlayerName()}! 🎉`;
-  const subtitle = `You've completed the round in ${GamePlay.getGameDuration()}!`;
+const validateForm = () => {
+  const form = $(".needs-validation")[0];
+  form.classList.add("was-validated");
+  return form.checkValidity();
+};
 
-  winModal.find(".modal-title").text(title);
-  winModal.find(".modal-subtitle").text(subtitle);
+const handleCloseWinModal = () => GameStateManager.setState(GameState.MAIN_SCREEN);
+const handlePlayAgain = () => GameStateManager.setState(GameState.PLAYING);
+const handlePlayWithNewConfigs = () => GameStateManager.setState(GameState.GAME_CONFIGS);
+const handleStartGame = (event) => {
+  event.preventDefault();
+  if (validateForm()) {
+    GameStateManager.setState(GameState.PLAYING);
+  } else {
+    event.stopPropagation();
+  }
+};
 
-  GameStateManager.setState(GameState.WIN_SCREEN);
+const buttonHandlers = {
+  "start-game-btn": handleStartGame,
+  "close-win-modal-btn": handleCloseWinModal,
+  "play-win-modal-btn": handlePlayAgain,
+  "play-with-new-configs-win-modal-btn": handlePlayWithNewConfigs,
 };
 
 $(() => {
   GameStateManager.setState(GameState.MAIN_SCREEN);
+  UIManager.configs.reset();
 
-  document.getElementById("playerName").value =
-    NAME_SUGGESTIONS[Math.floor(Math.random() * NAME_SUGGESTIONS.length)];
+  $(document).on("click", "#show-matches-toggle", () => {
+    SoundManager.playFXSound(audio.click);
+    const showMatchedPairsMode = GamePlay.toggleShowMatchedPairsMode();
+    UIManager.configs.renderMatchedPairsToggle(showMatchedPairsMode);
+  });
 
   $(document).on("click", "#play-btn", () => {
     SoundManager.playFXSound(audio.click);
@@ -56,57 +57,24 @@ $(() => {
   });
 
   $(document).on("click", "#music-toggle", () => {
-    SoundManager.toggleMusic();
-    const musicToggle = document.querySelector("#music-toggle");
-    if (SoundManager.isMusicOn()) {
-      musicToggle.innerHTML = "music_note";
-      SoundManager.playMusic(audio.background);
-    } else {
-      musicToggle.innerHTML = "music_off";
-      SoundManager.pauseMusic(audio.background);
-    }
+    const isMusicOn = SoundManager.toggleMusic();
+    SoundManager.handleMusicStateChange(audio.background);
+    UIManager.navbar.renderMusicMode(isMusicOn);
   });
 
   $(document).on("click", "#sound-toggle", () => {
-    SoundManager.toggleSound();
-    const soundToggle = document.querySelector("#sound-toggle");
-    if (SoundManager.isSoundOn()) {
-      soundToggle.innerHTML = "volume_up";
-    } else {
-      soundToggle.innerHTML = "volume_off";
-    }
+    const isSoundOn = SoundManager.toggleSound();
+    UIManager.navbar.renderSoundMode(isSoundOn);
   });
 
   $(document).on("click", ".btn", (event) => {
     SoundManager.playFXSound(audio.click);
 
-    switch (event.target.id) {
-      case "start-game-btn": {
-        ("use strict");
-        const form = document.querySelectorAll(".needs-validation")[0];
-        event.preventDefault();
-        if (!form.checkValidity()) {
-          event.stopPropagation();
-        } else {
-          GameStateManager.setState(GameState.PLAYING);
-        }
-        form.classList.add("was-validated");
-        break;
-      }
-      case "close-win-modal-btn": {
-        GameStateManager.setState(GameState.MAIN_SCREEN);
-        break;
-      }
-      case "play-win-modal-btn": {
-        GameStateManager.setState(GameState.PLAYING);
-        break;
-      }
-      case "play-with-new-configs-win-modal-btn": {
-        GameStateManager.setState(GameState.GAME_CONFIGS);
-        break;
-      }
-      default:
-        break;
+    const handler = buttonHandlers[event.target.id];
+    if (handler) {
+      handler(event);
+    } else {
+      console.warn("Unhandled button click:", event.target.id);
     }
   });
 });

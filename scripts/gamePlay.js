@@ -1,4 +1,5 @@
 import { initializeBoard } from "./board.js";
+import { UIManager } from "./uiManager.js";
 
 export const GamePlay = (() => {
   let totalCards;
@@ -7,6 +8,7 @@ export const GamePlay = (() => {
   let playerName;
   let gameTimerIntervalID;
   let gameDuration;
+  let showMatchedPairsMode = false;
 
   const startTimer = () => {
     let timer = 0,
@@ -24,7 +26,7 @@ export const GamePlay = (() => {
       seconds = seconds < 10 ? "0" + seconds : seconds;
 
       gameDuration = hours + ":" + minutes + ":" + seconds;
-      $("#timer").html(gameDuration);
+      UIManager.navbar.updateGameTime(gameDuration);
 
       timer++;
     }, 1000);
@@ -34,6 +36,16 @@ export const GamePlay = (() => {
     clearInterval(gameTimerIntervalID);
   };
 
+  const resetGameVariables = () => {
+    const configs = UIManager.configs.getConfigs();
+    playerName = configs.playerName;
+    totalCards = configs.totalCards;
+    revealedCards = 0;
+    pairsFound = 0;
+    gameTimerIntervalID = null;
+    gameDuration = "";
+  };
+
   return {
     setTotalCards: (cards) => (totalCards = cards),
     getTotalCards: () => totalCards,
@@ -41,7 +53,6 @@ export const GamePlay = (() => {
     unrevealCard: () => revealedCards--,
     unrevealPair: () => (revealedCards -= 2),
     getRevealedCards: () => revealedCards,
-    getRevealedCardEls: () => $(".card-placeholder").find(".revealed"),
     foundPair: () => pairsFound++,
     getPairsFound: () => pairsFound,
     setPlayerName: (name) => (playerName = name),
@@ -51,17 +62,17 @@ export const GamePlay = (() => {
     setGameDuration: (duration) => (gameDuration = duration),
     getGameDuration: () => gameDuration,
     isAllRevealed: () => pairsFound * 2 == totalCards,
+    toggleShowMatchedPairsMode: () => {
+      showMatchedPairsMode = !showMatchedPairsMode;
+      return showMatchedPairsMode;
+    },
+    getShowMatchedPairsMode: () => showMatchedPairsMode,
     setNewGame: () => {
-      revealedCards = 0;
-      pairsFound = 0;
-      totalCards = $("#cards").val();
-      gameTimerIntervalID = null;
-      gameDuration = "";
-      playerName = $("#playerName").val();
-      $("#player").html(playerName);
+      resetGameVariables();
+      UIManager.navbar.renderPlayerName(playerName);
       initializeBoard();
       startTimer();
     },
-    endGame: () => stopTimer()
+    stopGame: () => stopTimer()
   };
 })();

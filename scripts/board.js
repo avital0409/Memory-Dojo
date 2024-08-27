@@ -1,14 +1,15 @@
 import { createCards } from './cards.js'
 import { images } from "./assets.js";
 import { GamePlay } from "./gamePlay.js";
+import { UIManager } from './uiManager.js';
 
 const DEFAULT_CARD_SIZE = 150;
 
 let cardSize;
 
 export const initializeBoard = () => {
-  $(".card-placeholder").remove();
-  let imagesArr = chooseImages();
+  UIManager.cards.removeAll();
+  const imagesArr = chooseImages();
   shuffle(imagesArr);
   createCards(imagesArr);
   calculateOptimalCardSize();
@@ -16,11 +17,11 @@ export const initializeBoard = () => {
 };
 
 const chooseImages = () => {
-  let imagesLeftToChooseFrom = [...images];
-  let imagesChosen = new Array(GamePlay.getTotalCards() / 2);
+  const imagesLeftToChooseFrom = [...images];
+  const imagesChosen = new Array(GamePlay.getTotalCards() / 2);
 
   for (let i = 0; i < GamePlay.getTotalCards() / 2; i++) {
-    let randomIndex = Math.floor(Math.random() * imagesLeftToChooseFrom.length);
+    const randomIndex = Math.floor(Math.random() * imagesLeftToChooseFrom.length);
     imagesChosen[i] = imagesLeftToChooseFrom[randomIndex].slice();
     imagesLeftToChooseFrom.splice(randomIndex, 1);
   }
@@ -45,30 +46,39 @@ const shuffle = (array) => {
 };
 
 const adjustCardSize = () => {
-  const cardElements = document.querySelectorAll(".card-placeholder");
-  const qms = document.querySelectorAll(".qm");
+  const cardElements = UIManager.cards.getAll();
+  const qms = UIManager.cards.getAllQMs();
 
-  cardElements.forEach((card) => {
-    card.style.setProperty("width", `${cardSize / 16}rem`, "important");
-    card.style.setProperty("height", `${cardSize / 16}rem`, "important");
+  cardElements.each((index, card) => {
+    $(card).css({
+      width: `${cardSize / 16}rem`,
+      height: `${cardSize / 16}rem`
+    });
   });
 
-  qms.forEach((qm) => {
-    qm.style.setProperty("font-size", `${(cardSize * 0.6) / 16}rem`);
-    qm.style.setProperty("line-height", `${(cardSize * 0.6 * 1.11) / 16}rem`);
-    qm.style.setProperty("height", `${(cardSize * 0.6) / 16}rem`);
+  qms.each((index, qm) => {
+    $(qm).css({
+      "font-size": `${(cardSize * 0.6) / 16}rem`,
+      "line-height": `${(cardSize * 0.6 * 1.11) / 16}rem`,
+      height: `${(cardSize * 0.6) / 16}rem`
+    });
   });
 };
 
 const calculateOptimalCardSize = () => {
-  const boardElement = document.getElementById("board");
+  const boardElement = UIManager.getBoard()[0];
   const boardHeight = boardElement.clientHeight;
   const boardWidth = boardElement.clientWidth;
+  const totalCards = GamePlay.getTotalCards();
+  console.log("totalCards: " + totalCards);
+  console.log("boardHeight: " + boardHeight);
+  console.log("boardWidth: " + boardWidth);
 
   let optimalCardSize = 0;
   let rows;
-  for (let columns = 1; columns <= GamePlay.getTotalCards(); columns++) {
-    rows = Math.ceil(GamePlay.getTotalCards() / columns);
+
+  for (let columns = 1; columns <= totalCards; columns++) {
+    rows = Math.ceil(totalCards / columns);
     const cardSizeByWidth = boardWidth / columns;
     const cardSizeByHeight = boardHeight / rows;
     const cardSize = Math.min(cardSizeByWidth, cardSizeByHeight);
@@ -79,6 +89,7 @@ const calculateOptimalCardSize = () => {
   }
 
   cardSize = Math.min(optimalCardSize - 16 - 16 / rows, DEFAULT_CARD_SIZE);
+  console.log("cardSize: " + cardSize);
 };
 
 $(window).on("resize", () => {

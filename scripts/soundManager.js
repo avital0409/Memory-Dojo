@@ -19,8 +19,18 @@ export const SoundManager = (() => {
   return {
     isMusicOn: () => music,
     isSoundOn: () => sound,
-    toggleMusic: () => music = !music,
-    toggleSound: () => sound = !sound,
+    toggleMusic: () => {
+      music = !music;
+      return music;
+    },
+    toggleSound: () => {
+      sound = !sound;
+      return sound;
+    },
+    handleMusicStateChange: (audio) => {
+      const musicAction = music ? 'playMusic' : 'pauseMusic';
+      SoundManager[musicAction](audio);
+    },
     playFXSound: (audio) => {
       if (sound) {
         audio.pause();

@@ -1,130 +1,92 @@
-import { audio } from './assets.js';
-import { SoundManager } from './soundManager.js';
-import { onWinning } from './main.js'
+import { audio } from "./assets.js";
+import { SoundManager } from "./soundManager.js";
+import { onWinning } from "./main.js";
 import { GamePlay } from "./gamePlay.js";
+import { UIManager } from "./uiManager.js";
+
+const CARD_ACTIONS = {
+  reveal: "reveal",
+  unreveal: "unreveal"
+};
 
 export const createCards = (chosenImages) => {
   for (let cardId = 1; cardId <= GamePlay.getTotalCards(); cardId++) {
-    let cardScene = $("<div></div>").attr({
-      class: "card-placeholder m-0 bg-transparent",
-      id: "card-placeholder" + cardId,
-    });
-
-    let card = $("<div></div>").attr({
-      class: "card w-100 h-100 position-relative shadow-sm",
-      id: "card" + cardId,
-    });
-
-    let cardFront = $("<div></div>")
-      .attr({
-        class: "card-front w-100 h-100 bg-white position-absolute rounded",
-        id: "card" + cardId + "Front",
-      })
-      .css("background-image", "url(" + chosenImages[cardId - 1] + ")")
-      .css("background-size", "contain");
-
-    let cardBack = $("<div></div>").attr({
-      class:
-        "card-back w-100 h-100 position-relative border border-white border-4 rounded",
-      id: "card" + cardId + "Back",
-    });
-
-    let cardBackDrawing = $("<div></div>").attr({
-      class:
-        "card-back-drawing position-absolute w-75 h-75 rounded-circle top-50 start-50 translate-middle",
-      id: "card-back-drawing" + cardId,
-    });
-
-    let questionMark = $("<div></div>")
-      .attr({
-        class:
-          "qm position-absolute top-50 start-50 translate-middle text-white comfortaa text-center",
-        id: "qm" + cardId,
-      })
-      .text("?");
-
-    cardBackDrawing.append(questionMark);
-    cardBack.append(cardBackDrawing);
-    card.append(cardBack);
-    card.append(cardFront);
-    cardScene.append(card);
-    $("#board").append(cardScene);
-    card.hover(onCardHover);
+    const card = UIManager.cards.new(cardId, chosenImages);
+    UIManager.getBoard().append(card);
     card.click(onCardClick);
   }
 };
 
-const onCardHover = (e) => {
-  var hoveredCard = $("#" + e.target.id)
-    .parentsUntil(".card-placeholder")
-    .last();
-  $(hoveredCard).css("cursor", "pointer");
-};
-
 const onCardClick = (e) => {
-  var clickedCard = $("#" + e.target.id)
-    .parentsUntil(".card-placeholder")
-    .last();
-
   SoundManager.playFXSound(audio.flip);
 
-  if ($(clickedCard).attr("class").includes("revealed")) {
+  const clickedCard = UIManager.cards.getPlaceholder(e.target.id);
+
+  if (UIManager.cards.isRevealed(clickedCard)) {
     unreveal(clickedCard);
   } else if (GamePlay.getRevealedCards() < 2) {
     reveal(clickedCard);
   }
 
   if (GamePlay.getRevealedCards() == 2) {
-    if (!isAMatch()) {
-      setTimeout(() => {
-        GamePlay.getRevealedCardEls().each(function () {
-          unreveal($(this));
-        });
-      }, 500);
+    if (isAMatch()) {
+      handleMatch();
+    }
+    if (GamePlay.isAllRevealed()) {
+      setTimeout(onWinning, 500);
     } else {
-      if (GamePlay.isAllRevealed()) {
-        setTimeout(onWinning, 500);
-      }
+      setTimeout(
+        () =>
+          UIManager.cards.getRevealedCardEls()
+            .toArray()
+            .forEach((el) => unreveal($(el))),
+        500
+      );
     }
   }
 };
 
 const unreveal = (card) => {
   GamePlay.unrevealCard();
-  $(card).toggleClass("revealed").css("transform", "rotateY(0deg)");
+  UIManager.cards.flip(card, CARD_ACTIONS.unreveal);
 };
 
 const reveal = (card) => {
   GamePlay.revealCard();
-  $(card).toggleClass("revealed").css("transform", "rotateY(180deg)");
+  UIManager.cards.flip(card, CARD_ACTIONS.reveal);
+};
+
+const hideMatchedCards = (revealedCardEls) => {
+  setTimeout(() => {
+    for (let i = 0; i < 2; i++) {
+      UIManager.cards.hide(revealedCardEls.eq(i));
+    }
+  }, 1000);
 };
 
 const isAMatch = () => {
-  let revealedCardEls = GamePlay.getRevealedCardEls();
-  let card1Img = $(revealedCardEls)
-    .eq(0)
-    .find(".card-front")
-    .css("background-image");
-  let card2Img = $(revealedCardEls)
-    .eq(1)
-    .find(".card-front")
-    .css("background-image");
+  const revealedCardEls = UIManager.cards.getRevealedCardEls();
+  const card1Img = UIManager.cards.getImage($(revealedCardEls).eq(0));
+  const card2Img = UIManager.cards.getImage($(revealedCardEls).eq(1));
+  return card1Img === card2Img;
+};
 
-  if (card1Img === card2Img) {
-    SoundManager.playFXSound(audio.match);
-    GamePlay.foundPair();
-    GamePlay.unrevealPair();
+const handleMatch = () => {
+  const revealedCardEls = UIManager.cards.getRevealedCardEls();
+
+  SoundManager.playFXSound(audio.match);
+  GamePlay.foundPair();
+  GamePlay.unrevealPair();
+
+  for (let i = 0; i < 2; i++) {
+    revealedCardEls.eq(i).toggleClass("revealed");
+  } 
+
+  if (GamePlay.getShowMatchedPairsMode()) {
     for (let i = 0; i < 2; i++) {
-      revealedCardEls.eq(i).toggleClass("revealed");
+      revealedCardEls.eq(i).off("click");
     }
-
-    setTimeout(() => {
-      for (let i = 0; i < 2; i++) {
-        revealedCardEls.eq(i).css("visibility", "hidden");
-      }
-    }, 1000);
-    return true;
   } else {
-    return false;
+    hideMatchedCards(revealedCardEls);
   }
 };
