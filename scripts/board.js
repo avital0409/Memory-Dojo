@@ -70,9 +70,6 @@ const calculateOptimalCardSize = () => {
   const boardHeight = boardElement.clientHeight;
   const boardWidth = boardElement.clientWidth;
   const totalCards = GamePlay.getTotalCards();
-  console.log("totalCards: " + totalCards);
-  console.log("boardHeight: " + boardHeight);
-  console.log("boardWidth: " + boardWidth);
 
   let optimalCardSize = 0;
   let rows;
@@ -89,7 +86,6 @@ const calculateOptimalCardSize = () => {
   }
 
   cardSize = Math.min(optimalCardSize - 16 - 16 / rows, DEFAULT_CARD_SIZE);
-  console.log("cardSize: " + cardSize);
 };
 
 $(window).on("resize", () => {
