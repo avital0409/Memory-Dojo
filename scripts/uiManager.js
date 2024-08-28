@@ -1,4 +1,5 @@
 import { GamePlay } from "./gamePlay.js";
+import { chosenImages } from "./board.js";
 
 export const UIManager = (() => {
   const UI = {
@@ -56,8 +57,47 @@ export const UIManager = (() => {
 
   const CARD_FLIP_DIRECTION = {
     reveal: "rotateY(180deg)",
-    unreveal: "rotateY(0deg)"
+    unreveal: "rotateY(0deg)",
   };
+
+  const createNewElement = (classes, id) =>
+    $("<div></div>").addClass(classes).attr("id", id);
+
+  const newCardPlaceholder = (cardId) =>
+    createNewElement(
+      "card-placeholder m-0 bg-transparent pointer",
+      `card-placeholder${cardId}`
+    );
+  const newCard = (cardId) =>
+    createNewElement(
+      "card w-100 h-100 position-relative shadow-sm",
+      `card${cardId}`
+    );
+  const newCardFront = (cardId) =>
+    createNewElement(
+      "card card-front w-100 h-100 bg-white position-absolute rounded",
+      `card-front${cardId}`
+    )
+      .css("background-image", `url(${chosenImages[cardId - 1]})`)
+      .css("background-size", "contain");
+
+  const newCardBack = (cardId) =>
+    createNewElement(
+      "card-back w-100 h-100 position-relative border border-white border-4 rounded",
+      `card-back${cardId}`
+    );
+
+  const newCardBackDrawing = (cardId) =>
+    createNewElement(
+      "card-back-drawing position-absolute w-75 h-75 rounded-circle top-50 start-50 translate-middle",
+      `card-back-drawing${cardId}`
+    );
+
+  const newQuestionMark = (cardId) =>
+    createNewElement(
+      "qm position-absolute top-50 start-50 translate-middle text-white comfortaa text-center",
+      `qm${cardId}`
+    ).text("?");
 
   const showWinDialog = () => {
     const title = `🎉 Congratulations, ${GamePlay.getPlayerName()}! 🎉`;
@@ -66,50 +106,6 @@ export const UIManager = (() => {
     UI.winModal.find(".modal-title").text(title);
     UI.winModal.find(".modal-subtitle").text(subtitle);
   };
-
-  const newCardPlaceholder = (cardId) =>
-    $("<div></div>").attr({
-      class: "card-placeholder m-0 bg-transparent pointer",
-      id: "card-placeholder" + cardId,
-    });
-
-  const newCard = (cardId) =>
-    $("<div></div>").attr({
-      class: "card w-100 h-100 position-relative shadow-sm",
-      id: "card" + cardId,
-    });
-
-  const newCardFront = (cardId, chosenImages) =>
-    $("<div></div>")
-      .attr({
-        class: "card-front w-100 h-100 bg-white position-absolute rounded",
-        id: "card" + cardId + "Front",
-      })
-      .css("background-image", "url(" + chosenImages[cardId - 1] + ")")
-      .css("background-size", "contain");
-
-  const newCardBack = (cardId) =>
-    $("<div></div>").attr({
-      class:
-        "card-back w-100 h-100 position-relative border border-white border-4 rounded",
-      id: "card" + cardId + "Back",
-    });
-
-  const newCardBackDrawing = (cardId) =>
-    $("<div></div>").attr({
-      class:
-        "card-back-drawing position-absolute w-75 h-75 rounded-circle top-50 start-50 translate-middle",
-      id: "card-back-drawing" + cardId,
-    });
-
-  const newQuestionMark = (cardId) =>
-    $("<div></div>")
-      .attr({
-        class:
-          "qm position-absolute top-50 start-50 translate-middle text-white comfortaa text-center",
-        id: "qm" + cardId,
-      })
-      .text("?");
 
   return {
     announceWinning: () => {
@@ -157,10 +153,14 @@ export const UIManager = (() => {
     },
     cards: {
       isRevealed: (card) => $(card).hasClass("revealed"),
-      flip: (card, action) => $(card).toggleClass("revealed").css("transform", CARD_FLIP_DIRECTION[action]),
-      hide: (card) => $(card).addClass('invisible'),
+      flip: (card, action) =>
+        $(card)
+          .toggleClass("revealed")
+          .css("transform", CARD_FLIP_DIRECTION[action]),
+      hide: (card) => $(card).addClass("invisible"),
       getImage: (card) => $(card).find(".card-front").css("background-image"),
-      getPlaceholder: (id) => $("#" + id).parentsUntil(".card-placeholder").last(),
+      getPlaceholder: (id) =>
+        $(`#${id}`).parentsUntil(".card-placeholder").last(),
       getRevealedCardEls: () => $(".card-placeholder").find(".revealed"),
       getAll: () => $(".card-placeholder"),
       removeAll: () => $(".card-placeholder").remove(),
@@ -172,14 +172,14 @@ export const UIManager = (() => {
         const cardBack = newCardBack(cardId);
         const cardBackDrawing = newCardBackDrawing(cardId);
         const questionMark = newQuestionMark(cardId);
-  
+
         cardBackDrawing.append(questionMark);
         cardBack.append(cardBackDrawing);
         card.append(cardBack);
         card.append(cardFront);
         cardPlaceholder.append(card);
         return cardPlaceholder;
-      }
+      },
     },
     getBoard: () => UI.board,
   };

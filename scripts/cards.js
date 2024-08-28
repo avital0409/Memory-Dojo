@@ -18,6 +18,7 @@ export const createCards = (chosenImages) => {
 };
 
 const onCardClick = (e) => {
+  e.stopPropagation();
   SoundManager.playFXSound(audio.flip);
 
   const clickedCard = UIManager.cards.getPlaceholder(e.target.id);

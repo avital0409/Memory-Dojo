@@ -6,12 +6,13 @@ import { UIManager } from './uiManager.js';
 const DEFAULT_CARD_SIZE = 150;
 
 let cardSize;
+export let chosenImages;
 
 export const initializeBoard = () => {
   UIManager.cards.removeAll();
-  const imagesArr = chooseImages();
-  shuffle(imagesArr);
-  createCards(imagesArr);
+  chosenImages = chooseImages();
+  shuffle(chosenImages);
+  createCards(chosenImages);
   calculateOptimalCardSize();
   adjustCardSize();
 };
