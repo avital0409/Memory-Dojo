@@ -80,14 +80,13 @@ const handleMatch = () => {
   GamePlay.unrevealPair();
 
   for (let i = 0; i < 2; i++) {
-    revealedCardEls.eq(i).toggleClass("revealed");
-  } 
-
-  if (GamePlay.getShowMatchedPairsMode()) {
-    for (let i = 0; i < 2; i++) {
-      revealedCardEls.eq(i).off("click");
-    }
-  } else {
+    const cardPlaceholder = revealedCardEls.eq(i).closest('.card-placeholder');
+    cardPlaceholder.off("click");
+    cardPlaceholder.removeClass("pointer");
+    revealedCardEls.eq(i).removeClass("revealed");
+  }
+  
+  if (!GamePlay.getShowMatchedPairsMode()) {
     hideMatchedCards(revealedCardEls);
   }
 };

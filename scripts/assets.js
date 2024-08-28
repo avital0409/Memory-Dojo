@@ -34,6 +34,10 @@ export const images = [
     "images/cards/Coconut.png",
     "images/cards/WaterPistol.png",
     "images/cards/Bucket.png",
+	"images/cards/Sunhat.png",
+	"images/cards/Conch.png",
+	"images/cards/MessageInBottle.png",
+	"images/cards/Surf.png",
 ];
 
 export const audio = {
