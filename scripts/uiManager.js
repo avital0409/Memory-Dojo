@@ -95,7 +95,7 @@ export const UIManager = (() => {
 
   const newQuestionMark = (cardId) =>
     createNewElement(
-      "qm position-absolute top-50 start-50 translate-middle text-white comfortaa text-center",
+      "qm position-absolute top-50 start-50 translate-middle text-white comfortaa text-center no-select",
       `qm${cardId}`
     ).text("?");
 

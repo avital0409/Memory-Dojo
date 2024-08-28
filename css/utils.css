@@ -45,3 +45,7 @@
     background-color: var(--secondary-theme-color) !important;
     color: var(--primary-theme-color) !important;
 }
+
+.no-select {
+    user-select: none;
+}
