@@ -1,5 +1,4 @@
 export const SoundManager = (() => {
-
   let music = true;
   let sound = true;
 
@@ -28,7 +27,7 @@ export const SoundManager = (() => {
       return sound;
     },
     handleMusicStateChange: (audio) => {
-      const musicAction = music ? 'playMusic' : 'pauseMusic';
+      const musicAction = music ? "playMusic" : "pauseMusic";
       SoundManager[musicAction](audio);
     },
     playFXSound: (audio) => {
@@ -46,7 +45,9 @@ export const SoundManager = (() => {
         soundAudio.play();
       }
       soundAudio.addEventListener("ended", () => {
-        fadeInSound(musicAudio, 1000);
+        if (music) {
+          fadeInSound(musicAudio, 1000);
+        }
       });
     },
     playMusic: (audio) => {
@@ -54,6 +55,6 @@ export const SoundManager = (() => {
         audio.play();
       }
     },
-    pauseMusic: (audio) => audio.pause()
+    pauseMusic: (audio) => audio.pause(),
   };
 })();

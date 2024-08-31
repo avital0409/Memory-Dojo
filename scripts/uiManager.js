@@ -75,11 +75,12 @@ export const UIManager = (() => {
     );
   const newCardFront = (cardId) =>
     createNewElement(
-      "card card-front w-100 h-100 bg-white position-absolute rounded",
+      "card-front w-100 h-100 bg-white position-absolute rounded",
       `card-front${cardId}`
     )
       .css("background-image", `url(${chosenImages[cardId - 1]})`)
-      .css("background-size", "contain");
+      .css("background-size", "contain")
+      .attr("draggable", false);
 
   const newCardBack = (cardId) =>
     createNewElement(
@@ -116,7 +117,7 @@ export const UIManager = (() => {
           y: 0.75,
         },
       });
-      setTimeout(showWinDialog);
+      showWinDialog();
     },
     configs: {
       reset: () => {
@@ -159,8 +160,7 @@ export const UIManager = (() => {
           .css("transform", CARD_FLIP_DIRECTION[action]),
       hide: (card) => $(card).addClass("invisible"),
       getImage: (card) => $(card).find(".card-front").css("background-image"),
-      getPlaceholder: (id) =>
-        $(`#${id}`).parentsUntil(".card-placeholder").last(),
+      getCard: (id) => $(`#${id}`).closest(".card"),
       getRevealedCardEls: () => $(".card-placeholder").find(".revealed"),
       getAll: () => $(".card-placeholder"),
       removeAll: () => $(".card-placeholder").remove(),
